@@ -22,26 +22,14 @@ from django.forms.models import modelform_factory
 from django.test import TestCase
 
 from multiselectfield.utils import get_max_length
-
 from .models import Book, PROVINCES, STATES, PROVINCES_AND_STATES
 
 
-if sys.version_info < (3,):
-    u = unicode  # noqa: F821
-else:
-    u = str
-
-
-if VERSION < (1, 9):
-    def get_field(model, name):
-        return model._meta.get_field_by_name(name)[0]
-else:
-    def get_field(model, name):
-        return model._meta.get_field(name)
+def get_field(model, name):
+    return model._meta.get_field(name)
 
 
 class MultiSelectTestCase(TestCase):
-
     fixtures = ['app_data.json']
     maxDiff = 4000
 
@@ -92,8 +80,11 @@ class MultiSelectTestCase(TestCase):
         book = Book.objects.get(id=1)
         self.assertEqual(book.get_tags_display(), 'Sex, Work, Happy')
         self.assertEqual(book.get_tags_list(), ['Sex', 'Work', 'Happy'])
-        self.assertEqual(book.get_categories_display(), 'Handbooks and manuals by discipline, Books of literary criticism, Books about literature')
-        self.assertEqual(book.get_categories_list(), ['Handbooks and manuals by discipline', 'Books of literary criticism', 'Books about literature'])
+        self.assertEqual(book.get_categories_display(),
+                         'Handbooks and manuals by discipline, Books of literary criticism, Books about literature')
+        self.assertEqual(book.get_categories_list(),
+                         ['Handbooks and manuals by discipline', 'Books of literary criticism',
+                          'Books about literature'])
 
         self.assertEqual(book.get_tags_list(), book.get_tags_display().split(', '))
         self.assertEqual(book.get_categories_list(), book.get_categories_display().split(', '))
@@ -137,7 +128,7 @@ class MultiSelectTestCase(TestCase):
 
         if VERSION < (4, 0):
             # Django 3.2 and below
-            expected_html = u(
+            expected_html = str(
                 '<p><label>Province or State:</label> <ul id="id_published_in"><li>Canada - Provinces<ul id="id_published_in_0"><li><label for="id_published_in_0_0"><input id="id_published_in_0_0" name="published_in" type="checkbox" value="AB" /> Alberta</label></li>'
                 '<li><label for="id_published_in_0_1"><input checked id="id_published_in_0_1" name="published_in" type="checkbox" value="BC" /> British Columbia</label></li></ul></li>'
                 '<li>USA - States<ul id="id_published_in_1"><li><label for="id_published_in_1_0"><input checked id="id_published_in_1_0" name="published_in" type="checkbox" value="AK" /> Alaska</label></li>'
@@ -146,7 +137,7 @@ class MultiSelectTestCase(TestCase):
             )
         else:
             # Django 4.0 and above
-            expected_html = u(
+            expected_html = str(
                 '<p><label>Province or State:</label> <div id="id_published_in"><div><label>Canada - Provinces</label><div><label for="id_published_in_0_0"><input id="id_published_in_0_0" name="published_in" type="checkbox" value="AB" /> Alberta</label></div>\n'
                 '<div><label for="id_published_in_0_1"><input checked="checked" id="id_published_in_0_1" name="published_in" type="checkbox" value="BC" /> British Columbia</label></div></div>\n'
                 '<div><label>USA - States</label><div><label for="id_published_in_1_0"><input checked="checked" id="id_published_in_1_0" name="published_in" type="checkbox" value="AK" /> Alaska</label></div>\n'
