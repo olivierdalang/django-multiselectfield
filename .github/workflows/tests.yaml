@@ -10,19 +10,27 @@ jobs:
     strategy:
       # all supported django version on lowest/highest supported python
       # see https://www.djangoproject.com/download/#supported-versions
-      # and https://docs.djangoproject.com/en/4.2/faq/install/#what-python-version-can-i-use-with-django
+      # and https://docs.djangoproject.com/en/5.0/faq/install/#what-python-version-can-i-use-with-django
       matrix:
         include:
-          - { dj: "3.2.*", py: "3.7" }
+          - { dj: "3.2.*", py: "3.8" }
+          - { dj: "3.2.*", py: "3.9" }
           - { dj: "3.2.*", py: "3.10" }
           - { dj: "4.0.*", py: "3.8" }
+          - { dj: "4.0.*", py: "3.9" }
           - { dj: "4.0.*", py: "3.10" }
           - { dj: "4.1.*", py: "3.8" }
+          - { dj: "4.1.*", py: "3.9" }
+          - { dj: "4.1.*", py: "3.10" }
           - { dj: "4.1.*", py: "3.11" }
           - { dj: "4.2.*", py: "3.8" }
+          - { dj: "4.2.*", py: "3.9" }
+          - { dj: "4.2.*", py: "3.10" }
+          - { dj: "4.2.*", py: "3.11" }
           - { dj: "4.2.*", py: "3.12" }
-#          - { dj: "5.0.*", py: "3.10" }
-#          - { dj: "5.0.*", py: "3.12" }
+          - { dj: "5.0.*", py: "3.10" }
+          - { dj: "5.0.*", py: "3.11" }
+          - { dj: "5.0.*", py: "3.12" }
       fail-fast: false
 
     steps:
