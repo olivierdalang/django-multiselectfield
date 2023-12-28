@@ -12,7 +12,7 @@
 # GNU Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser General Public License
-# along with this programe.  If not, see <http://www.gnu.org/licenses/>.
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 # Django settings for example project.
 import os
@@ -41,6 +41,8 @@ DATABASES = {
         'PORT': '',                      # Set to empty string for default.
     }
 }
+
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
 # Hosts/domain names that are valid for this site; required if DEBUG is False
 # See https://docs.djangoproject.com/en/1.5/ref/settings/#allowed-hosts
@@ -197,6 +199,7 @@ from django.conf import ENVIRONMENT_VARIABLE  # noqa: E402
 # I get an error
 if os.environ[ENVIRONMENT_VARIABLE] == 'example.settings':
     try:
+        # noinspection PyPackageRequirements
         import formadmin  # noqa: F401
         INSTALLED_APPS += ('formadmin',)
     except ImportError:

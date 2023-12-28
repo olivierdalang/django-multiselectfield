@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # Copyright (c) 2013 by Pablo Martín <goinnn@gmail.com>
 #
@@ -14,23 +15,21 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+"""Run the tests for django-multiselectfield."""
+import os
+import sys
 
-from django.core import validators
-from django.utils.translation import gettext_lazy as _
+import django
+from django.conf import ENVIRONMENT_VARIABLE
+from django.core import management
 
+if len(sys.argv) == 1:
+    os.environ[ENVIRONMENT_VARIABLE] = 'example.settings'
+else:
+    os.environ[ENVIRONMENT_VARIABLE] = sys.argv[1]
 
-class MaxValueMultiFieldValidator(validators.MaxLengthValidator):
-    code = 'max_multifield_value'
+django.setup()
 
-    def clean(self, x):
-        return len(','.join(x))
+print(django.VERSION)
 
-
-class MinChoicesValidator(validators.MinLengthValidator):
-    message = _(u'You must select a minimum of  %(limit_value)d choices.')
-    code = 'min_choices'
-
-
-class MaxChoicesValidator(validators.MaxLengthValidator):
-    message = _(u'You must select a maximum of  %(limit_value)d choices.')
-    code = 'max_choices'
+management.call_command('test', 'app')
