@@ -12,7 +12,7 @@
 # GNU Lesser General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser General Public License
-# along with this programe.  If not, see <http://www.gnu.org/licenses/>.
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import sys
 
@@ -20,7 +20,7 @@ from django import VERSION
 
 from django.db import models
 from django.utils.text import capfirst
-from django.core import exceptions
+from django.core import exceptions, validators
 
 from ..forms.fields import MultiSelectFormField, MinChoicesValidator, MaxChoicesValidator
 from ..utils import get_max_length
@@ -64,6 +64,7 @@ class MultiSelectField(models.CharField):
         self.min_choices = kwargs.pop('min_choices', None)
         self.max_choices = kwargs.pop('max_choices', None)
         super(MultiSelectField, self).__init__(*args, **kwargs)
+        self.validators = [v for v in self.validators if not isinstance(v, validators.MaxLengthValidator)]
         self.max_length = get_max_length(self.choices, self.max_length)
         self.validators.append(MaxValueMultiFieldValidator(self.max_length))
         if self.min_choices is not None:

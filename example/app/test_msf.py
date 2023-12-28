@@ -22,26 +22,14 @@ from django.forms.models import modelform_factory
 from django.test import TestCase
 
 from multiselectfield.utils import get_max_length
-
 from .models import Book, PROVINCES, STATES, PROVINCES_AND_STATES
 
 
-if sys.version_info < (3,):
-    u = unicode  # noqa: F821
-else:
-    u = str
-
-
-if VERSION < (1, 9):
-    def get_field(model, name):
-        return model._meta.get_field_by_name(name)[0]
-else:
-    def get_field(model, name):
-        return model._meta.get_field(name)
+def get_field(model, name):
+    return model._meta.get_field(name)
 
 
 class MultiSelectTestCase(TestCase):
-
     fixtures = ['app_data.json']
     maxDiff = 4000
 
@@ -77,12 +65,8 @@ class MultiSelectTestCase(TestCase):
         # call Field.from_db_field, it simply returns a Python representation
         # of the data in the database (which in our case is a string of
         # comma-separated values). The bug was fixed in Django 1.8+.
-        if VERSION >= (1, 6) and VERSION < (1, 8):
-            self.assertStringEqual(tag_list_list, [u('sex,work,happy')])
-            self.assertStringEqual(categories_list_list, [u('1,3,5')])
-        else:
-            self.assertListEqual(tag_list_list, [['sex', 'work', 'happy']])
-            self.assertListEqual(categories_list_list, [['1', '3', '5']])
+        self.assertListEqual(tag_list_list, [['sex', 'work', 'happy']])
+        self.assertListEqual(categories_list_list, [['1', '3', '5']])
 
     def test_form(self):
         form_class = modelform_factory(Book, fields=('title', 'tags', 'categories'))
@@ -96,8 +80,11 @@ class MultiSelectTestCase(TestCase):
         book = Book.objects.get(id=1)
         self.assertEqual(book.get_tags_display(), 'Sex, Work, Happy')
         self.assertEqual(book.get_tags_list(), ['Sex', 'Work', 'Happy'])
-        self.assertEqual(book.get_categories_display(), 'Handbooks and manuals by discipline, Books of literary criticism, Books about literature')
-        self.assertEqual(book.get_categories_list(), ['Handbooks and manuals by discipline', 'Books of literary criticism', 'Books about literature'])
+        self.assertEqual(book.get_categories_display(),
+                         'Handbooks and manuals by discipline, Books of literary criticism, Books about literature')
+        self.assertEqual(book.get_categories_list(),
+                         ['Handbooks and manuals by discipline', 'Books of literary criticism',
+                          'Books about literature'])
 
         self.assertEqual(book.get_tags_list(), book.get_tags_display().split(', '))
         self.assertEqual(book.get_categories_list(), book.get_categories_display().split(', '))
@@ -139,26 +126,28 @@ class MultiSelectTestCase(TestCase):
         self.assertEqual(len(form_class.base_fields), 1)
         form = form_class(initial={'published_in': ['BC', 'AK']})
 
-        expected_html = u("""<p><label>Province or State:</label> <div id="id_published_in"><div><label>Canada - Provinces</label><div><label for="id_published_in_0_0"><input id="id_published_in_0_0" name="published_in" type="checkbox" value="AB" /> Alberta</label></div>\n"""
-                          """<div><label for="id_published_in_0_1"><input checked="checked" id="id_published_in_0_1" name="published_in" type="checkbox" value="BC" /> British Columbia</label></div></div>\n"""
-                          """<div><label>USA - States</label><div><label for="id_published_in_1_0"><input checked="checked" id="id_published_in_1_0" name="published_in" type="checkbox" value="AK" /> Alaska</label></div>\n"""
-                          """<div><label for="id_published_in_1_1"><input id="id_published_in_1_1" name="published_in" type="checkbox" value="AL" /> Alabama</label></div>\n"""
-                          """<div><label for="id_published_in_1_2"><input id="id_published_in_1_2" name="published_in" type="checkbox" value="AZ" /> Arizona</label></div></div></div></p>""")
+        if VERSION < (4, 0):
+            # Django 3.2 and below
+            expected_html = str(
+                '<p><label>Province or State:</label> <ul id="id_published_in"><li>Canada - Provinces<ul id="id_published_in_0"><li><label for="id_published_in_0_0"><input id="id_published_in_0_0" name="published_in" type="checkbox" value="AB" /> Alberta</label></li>'
+                '<li><label for="id_published_in_0_1"><input checked id="id_published_in_0_1" name="published_in" type="checkbox" value="BC" /> British Columbia</label></li></ul></li>'
+                '<li>USA - States<ul id="id_published_in_1"><li><label for="id_published_in_1_0"><input checked id="id_published_in_1_0" name="published_in" type="checkbox" value="AK" /> Alaska</label></li>'
+                '<li><label for="id_published_in_1_1"><input id="id_published_in_1_1" name="published_in" type="checkbox" value="AL" /> Alabama</label></li>'
+                '<li><label for="id_published_in_1_2"><input id="id_published_in_1_2" name="published_in" type="checkbox" value="AZ" /> Arizona</label></li></ul></li></ul></p>'
+            )
+        else:
+            # Django 4.0 and above
+            expected_html = str(
+                '<p><label>Province or State:</label> <div id="id_published_in"><div><label>Canada - Provinces</label><div><label for="id_published_in_0_0"><input id="id_published_in_0_0" name="published_in" type="checkbox" value="AB" /> Alberta</label></div>\n'
+                '<div><label for="id_published_in_0_1"><input checked="checked" id="id_published_in_0_1" name="published_in" type="checkbox" value="BC" /> British Columbia</label></div></div>\n'
+                '<div><label>USA - States</label><div><label for="id_published_in_1_0"><input checked="checked" id="id_published_in_1_0" name="published_in" type="checkbox" value="AK" /> Alaska</label></div>\n'
+                '<div><label for="id_published_in_1_1"><input id="id_published_in_1_1" name="published_in" type="checkbox" value="AL" /> Alabama</label></div>\n'
+                '<div><label for="id_published_in_1_2"><input id="id_published_in_1_2" name="published_in" type="checkbox" value="AZ" /> Arizona</label></div></div></div></p>'
+            )
 
         actual_html = form.as_p()
 
-        if (1, 11) <= VERSION < (2, 0):
-            # Django 1.11+ does not assign 'for' attributes on labels if they
-            # are group labels
-            expected_html = expected_html.replace('label for="id_published_in_0"', 'label')
-
-        if VERSION < (1, 6):
-            # Django 1.6 renders the Python repr() for each group (eg: tuples
-            # with HTML entities), so we skip the test for that version
-            self.assertEqual(expected_html.replace('\n', ''), actual_html.replace('\n', ''))
-
-        if VERSION >= (1, 7):
-            self.assertHTMLEqual(expected_html, actual_html)
+        self.assertHTMLEqual(expected_html, actual_html)
 
 
 class MultiSelectUtilsTestCase(TestCase):
