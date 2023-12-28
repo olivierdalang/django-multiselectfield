@@ -1,24 +1,16 @@
 django-multiselectfield
 =======================
 
-.. image:: https://travis-ci.org/goinnn/django-multiselectfield.png?branch=master
-    :target: https://travis-ci.org/goinnn/django-multiselectfield
-
-.. image:: https://coveralls.io/repos/goinnn/django-multiselectfield/badge.png?branch=master
-    :target: https://coveralls.io/r/goinnn/django-multiselectfield
-
-.. image:: https://badge.fury.io/py/django-multiselectfield.png
-    :target: https://badge.fury.io/py/django-multiselectfield
-
+.. image:: ../../actions/workflows/tests.yaml/badge.svg
+    :target: .github/workflows/tests.yaml
 
 THIS IS A FORK OF https://github.com/goinnn/django-multiselectfield WHICH IS NOT MAINTAINED ANYMORE.
 
 This fork:
 
 - runs the tests in the CI
-- supports Django 4.1-5.0 (according to tests)
+- supports Django 3.2-5.0 (according to tests)
 - supports all active Python versions
-- welcomes PRs to support 3.2-4.0
 
 ========================================================================================
 
