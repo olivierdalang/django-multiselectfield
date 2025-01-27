@@ -181,6 +181,6 @@ if VERSION < (1, 8):
 
 try:
     from south.modelsinspector import add_introspection_rules
-    add_introspection_rules([], ['^multiselectfield\.db.fields\.MultiSelectField'])
+    add_introspection_rules([], [r'^multiselectfield\.db.fields\.MultiSelectField'])
 except ImportError:
     pass
